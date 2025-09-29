@@ -1,0 +1,706 @@
+{
+  "info": {
+    "_postman_id": "ca74fcbd-55b5-482a-9e1c-73b75c1c5b66",
+    "name": "School Store API",
+    "description": "Complete API collection for School Tools and Books Store",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "jwt",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "itemId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.token) {",
+                  "        pm.environment.set('jwt', response.token);",
+                  "        console.log('✅ JWT Token saved to environment!');",
+                  "        console.log('Token:', response.token);",
+                  "    }",
+                  "} else {",
+                  "    console.log('❌ Login failed');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login and automatically save JWT token"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints"
+    },
+    {
+      "name": "📦 Public Items",
+      "item": [
+        {
+          "name": "Get All Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["items"]
+            },
+            "description": "Get all items without authentication"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Books with Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/items?category=books&branch=preparatory&level=Prep1&keyword=math&sort=price&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["items"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "books",
+                  "description": "Filter by category"
+                },
+                {
+                  "key": "branch",
+                  "value": "preparatory",
+                  "description": "Filter by educational branch"
+                },
+                {
+                  "key": "level",
+                  "value": "Prep1",
+                  "description": "Filter by level"
+                },
+                {
+                  "key": "keyword",
+                  "value": "math",
+                  "description": "Search keyword"
+                },
+                {
+                  "key": "sort",
+                  "value": "price",
+                  "description": "Sort by field"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Example with all filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Tools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/items?category=tools&keyword=calculator&sort=-price",
+              "host": ["{{baseUrl}}"],
+              "path": ["items"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "tools"
+                },
+                {
+                  "key": "keyword",
+                  "value": "calculator"
+                },
+                {
+                  "key": "sort",
+                  "value": "-price"
+                }
+              ]
+            },
+            "description": "Search tools by keyword"
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Price Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/items?price[gte]=20&price[lte]=100&sort=price",
+              "host": ["{{baseUrl}}"],
+              "path": ["items"],
+              "query": [
+                {
+                  "key": "price[gte]",
+                  "value": "20",
+                  "description": "Minimum price"
+                },
+                {
+                  "key": "price[lte]",
+                  "value": "100",
+                  "description": "Maximum price"
+                },
+                {
+                  "key": "sort",
+                  "value": "price"
+                }
+              ]
+            },
+            "description": "Filter items by price range"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Item",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/items/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["items", "{{itemId}}"]
+            },
+            "description": "Get item by ID"
+          },
+          "response": []
+        }
+      ],
+      "description": "Public item endpoints (no auth required)"
+    },
+    {
+      "name": "🛠️ Admin Items",
+      "item": [
+        {
+          "name": "Get All Items (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/items?keyword=math&sort=-createdAt&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "items"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "math"
+                },
+                {
+                  "key": "sort",
+                  "value": "-createdAt"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Admin view - includes out of stock items"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Tool Item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "itemName",
+                  "value": "Scientific Calculator",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "45.99",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "tools",
+                  "type": "text"
+                },
+                {
+                  "key": "quantity",
+                  "value": "50",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Advanced scientific calculator with 240+ functions",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "items"]
+            },
+            "description": "Create a tool item (no branch/level needed)"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Book Item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "itemName",
+                  "value": "Mathematics Textbook",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "35.99",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "books",
+                  "type": "text"
+                },
+                {
+                  "key": "branch",
+                  "value": "preparatory",
+                  "type": "text",
+                  "description": "Required for books"
+                },
+                {
+                  "key": "level",
+                  "value": "Prep1",
+                  "type": "text",
+                  "description": "Required for books"
+                },
+                {
+                  "key": "quantity",
+                  "value": "25",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Complete mathematics textbook for Prep1 students",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "items"]
+            },
+            "description": "Create a book item (requires branch and level)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "price",
+                  "value": "39.99",
+                  "type": "text"
+                },
+                {
+                  "key": "quantity",
+                  "value": "30",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Updated description with new features",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/items/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "items", "{{itemId}}"]
+            },
+            "description": "Update existing item"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/items/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "items", "{{itemId}}"]
+            },
+            "description": "Delete item by ID"
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin item management (requires JWT)"
+    },
+    {
+      "name": "👥 Admin Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?keyword=john&sort=createdAt&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "john",
+                  "description": "Search in name and email"
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get all users with filtering"
+          },
+          "response": []
+        },
+        {
+          "name": "Create New User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\",\n    \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"]
+            },
+            "description": "Create new user account"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{userId}}"]
+            },
+            "description": "Get user details by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{userId}}"]
+            },
+            "description": "Delete user account"
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin user management (requires JWT)"
+    },
+    {
+      "name": "👤 Admin Profile",
+      "item": [
+        {
+          "name": "Update Profile Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Admin Name\",\n    \"email\": \"newemail@admin.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/profile/updateMe",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile", "updateMe"]
+            },
+            "description": "Update admin profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile Image",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profileImage",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/profile/updateImage",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile", "updateImage"]
+            },
+            "description": "Upload new profile image"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"oldPassword\": \"currentpassword\",\n    \"newPassword\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/profile/updatePassword",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile", "updatePassword"]
+            },
+            "description": "Change admin password"
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin profile management (requires JWT)"
+    }
+  ]
+}
