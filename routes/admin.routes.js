@@ -4,6 +4,7 @@ import {
   createItem,
   updateItem,
   deleteItem,
+  nuclearClear,
 } from "../controllers/admin.controller.js";
 import {
   getAllUsers,
@@ -45,5 +46,7 @@ adminRouter
 adminRouter
   .route("/profile/updatePassword")
   .patch(protectedRoutes, updateMyPassword);
+
+adminRouter.route("/nuclear-clear").delete(protectedRoutes, nuclearClear);
 
 export default adminRouter;

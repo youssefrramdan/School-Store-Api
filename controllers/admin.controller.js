@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import Item from "../models/item.model.js";
+import User from "../models/user.model.js";
 import ApiError from "../utils/apiError.js";
 import ApiFeatures from "../utils/apiFeatures.js";
 
@@ -108,4 +109,32 @@ const deleteItem = asyncHandler(async (req, res, next) => {
   });
 });
 
-export { getAllItems, createItem, updateItem, deleteItem };
+/**
+ * @desc    🚨 EXTREME DANGER: Clear EVERYTHING including current admin
+ * @route   DELETE /api/v1/admin/nuclear-clear
+ * @access  Private (Admin only)
+ * @warning This will delete EVERYTHING! Use with extreme caution!
+ */
+const nuclearClear = asyncHandler(async (req, res, next) => {
+  try {
+    // Delete ALL items
+    const deletedItems = await Item.deleteMany({});
+
+    // Delete ALL users (including current admin)
+    const deletedUsers = await User.deleteMany({});
+
+    res.status(200).json({
+      message: "☢️ NUCLEAR CLEAR COMPLETED",
+      warning: "EVERYTHING HAS BEEN DELETED!",
+      deleted: {
+        items: deletedItems.deletedCount,
+        users: deletedUsers.deletedCount,
+        note: "You will be logged out and need to recreate admin account",
+      },
+    });
+  } catch (error) {
+    return next(new ApiError("Failed to perform nuclear clear", 500));
+  }
+});
+
+export { getAllItems, createItem, updateItem, deleteItem, nuclearClear };

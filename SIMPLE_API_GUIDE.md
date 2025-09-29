@@ -29,6 +29,10 @@
 - `PATCH /api/v1/admin/profile/updateImage` - Update admin profile image
 - `PATCH /api/v1/admin/profile/updatePassword` - Update admin password
 
+** Dangerous Operations:**
+
+- `DELETE /api/v1/admin/nuclear-clear` - Clear EVERYTHING (including current admin)
+
 ## URL Parameters for `/api/v1/items`
 
 ### Basic Examples
